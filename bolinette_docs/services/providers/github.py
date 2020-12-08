@@ -1,4 +1,5 @@
 import asyncio
+import os
 import tarfile
 
 import requests
@@ -26,9 +27,9 @@ class GitHubHooksService(core.Service):
         return self.context.service('article')
 
     async def process_release(self, release, action):
-        if 'tag_name' not in release:
-            raise UnprocessableEntityError('github.release.no_tag_name')
         if action in ['released']:
+            if 'tag_name' not in release or 'tarball_url' not in release:
+                raise UnprocessableEntityError('github.release.no_tag_name')
             version = await self.version_service.get_first_by('tag', release['tag_name'], safe=True)
             if version is None:
                 version = await self.version_service.create({
@@ -36,32 +37,32 @@ class GitHubHooksService(core.Service):
                     'released': not release.get('prerelease', False),
                     'built': False
                 })
-            version.built = False
-            asyncio.create_task(self.create_release(version))
+            asyncio.create_task(self.create_release(version, release['tarball_url']))
 
-    async def create_release(self, version: Version):
+    async def create_release(self, version: Version, archive_url: str):
         try:
             async with blnt.Transaction(self.context):
                 tmp_dir = self.context.instance_path('tmp')
-                await self._download_and_extract(version, tmp_dir)
+                await self._download_and_extract(tmp_dir, archive_url)
                 await self._process_docs(version, tmp_dir)
                 version.built = True
         finally:
             paths.rm_r(tmp_dir)
 
-    async def _download_and_extract(self, version: Version, path: str):
+    async def _download_and_extract(self, path: str, archive_url: str):
         if not paths.exists(path):
             paths.mkdir(path)
         with open(paths.join(path, 'archive.tar.gz'), 'wb') as archive:
-            response = requests.get(blnt.init['archive_url'].replace('{tag}', version.tag))
+            response = requests.get(archive_url)
             archive.write(response.content)
         with tarfile.open(paths.join(path, 'archive.tar.gz'), 'r:gz') as archive:
             archive.extractall(path)
 
     async def _process_docs(self, version: Version, path: str):
-        app_path = paths.join(path, blnt.init['project_name'].replace('{version}', version.tag), 'docs')
-        if not paths.exists(app_path):
-            return
-        with open(paths.join(app_path, 'docs.yaml'), 'r') as doc_config:
-            config = yaml.safe_load(doc_config)
-        await self.article_service.parse_toc(version, config.get('toc', []), app_path)
+        for file in os.listdir(path):
+            file_path = paths.join(path, file)
+            app_path = paths.join(path, file, 'docs')
+            if os.path.isdir(file_path) and paths.exists(app_path):
+                with open(paths.join(app_path, 'docs.yaml'), 'r') as doc_config:
+                    config = yaml.safe_load(doc_config)
+                await self.article_service.parse_toc(version, config.get('toc', []), app_path)

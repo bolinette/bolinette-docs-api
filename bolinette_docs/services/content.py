@@ -21,19 +21,20 @@ class ContentService(core.Service):
             await self.delete(content)
 
     async def parse_article_toc(self, article: Article):
-        soup = BeautifulSoup(article.content, features="html.parser")
+        soup = BeautifulSoup(article.html, features="html.parser")
         position = 0
         last = []
         for section in soup:
             if section.name not in self._sections:
                 continue
             content = await self.create({
-                'name': section.name,
+                'name': section.text,
+                'tag': section.name,
                 'parent': None,
                 'article': article,
                 'position': position
             })
-            while len(last) > 0 and self._sections[section.name] <= self._sections[last[-1].name]:
+            while len(last) > 0 and self._sections[section.name] <= self._sections[last[-1].tag]:
                 last.pop()
             if len(last) > 0:
                 content.parent = last[-1]

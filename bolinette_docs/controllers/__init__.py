@@ -1,1 +1,2 @@
 import bolinette_docs.controllers.webhooks
+from bolinette_docs.controllers.docs import DocsController
