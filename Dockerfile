@@ -9,4 +9,5 @@ RUN pip install -r requirements.txt
 COPY bolinette_docs bolinette_docs
 COPY env env
 COPY server.py server.py
+EXPOSE 5000
 CMD ["python", "server.py", "run_server"]
