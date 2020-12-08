@@ -5,7 +5,7 @@ services:
     expose:
       - 5000
     ports:
-      - 5000:5000
+      - 127.0.0.1:5000:5000
     networks:
       - postgres
 networks:
