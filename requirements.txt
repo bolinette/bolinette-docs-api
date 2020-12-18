@@ -1,5 +1,5 @@
-Bolinette==0.6.12
-requests==2.25.0
+bolinette==0.7.3
+requests==2.25.1
 PyYAML==5.3.1
 Markdown==3.3.3
 beautifulsoup4==4.9.3
