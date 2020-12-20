@@ -1,0 +1,45 @@
+name: Deploy Bolinette Docs to server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.9
+    steps:
+      - name: Build and deploy on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            if [ ! -d ${{ secrets.DOCS_FOLDER }} ]; then
+              mkdir -p ${{ secrets.DOCS_FOLDER }};
+            fi
+            cd ${{ secrets.DOCS_FOLDER }}
+            if [ ! -d ${{ secrets.DOCS_FOLDER }}/.git ]; then
+              git clone ${{ secrets.DOCS_URL }} .;
+            fi
+            git fetch --prune
+            git switch master
+            git reset --hard master
+            git pull
+
+            mkdir env
+            echo "production" > env/.profile
+            echo "secret_key: ${{ secrets.DOCS_URL }}" > env/env.local.production.yaml
+            echo "github_secret: ${{ secrets.SIGNATURE_SECRET }}" >> env/env.local.production.yaml
+            echo "database: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}"  >> env/env.local.production.yaml
+            echo "host: 127.0.0.1" >> env/env.local.production.yaml
+            echo "debug: false" >> env/env.local.production.yaml
+            echo "build_docs: true" >> env/env.local.production.yaml
+
+            docker-compose down
+            docker-compose up --build -d
