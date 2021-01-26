@@ -35,7 +35,7 @@ class ArticleService(core.Service):
         position = 0
         for elem in toc:
             name = elem['name']
-            with open(paths.join(path, elem.get('path', ''), f'{name}.md')) as f:
+            with open(paths.join(path, f'{name}.md')) as f:
                 content = f.read()
                 article = await self.create({
                     'name': name,
@@ -47,7 +47,7 @@ class ArticleService(core.Service):
                 })
             await self.content_service.parse_article_toc(article)
             for lang in elem.get('languages', []):
-                with open(paths.join(path, elem.get('path', ''), f'{name}.{lang}.md')) as f:
+                with open(paths.join(path, f'{name}.{lang}.md')) as f:
                     content = f.read()
                     article = await self.create({
                         'name': name,
