@@ -7,6 +7,7 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY bolinette_docs bolinette_docs
+COPY manifest.blnt.yaml manifest.blnt.yaml
 COPY env env
 COPY server.py server.py
 EXPOSE 5000
