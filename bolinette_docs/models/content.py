@@ -17,11 +17,10 @@ class Content(core.Model):
     parent = types.defs.Relationship('content', remote_side=id,
                                      backref=types.defs.Backref('children', lazy=False), lazy=True)
 
-    @classmethod
-    def responses(cls):
+    def responses(self):
         yield [
-            mapping.Column(cls.name),
-            mapping.Column(cls.tag),
-            mapping.Column(cls.position),
+            mapping.Column(self.name),
+            mapping.Column(self.tag),
+            mapping.Column(self.position),
             mapping.List(mapping.Definition('content'), key='children')
         ]

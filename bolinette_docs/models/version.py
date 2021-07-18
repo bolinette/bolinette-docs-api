@@ -10,13 +10,16 @@ class Version(core.Model):
     tag = types.defs.Column(types.db.String, nullable=False)
     released = types.defs.Column(types.db.Boolean, nullable=False)
     built = types.defs.Column(types.db.Boolean, nullable=False)
+    created_on = types.defs.Column(types.db.Date, nullable=False)
+    published_on = types.defs.Column(types.db.Date, nullable=True)
 
-    @classmethod
-    def responses(cls):
+    def responses(self):
         base: List[Any] = [
-            mapping.Column(cls.tag)
+            mapping.Column(self.tag)
         ]
         yield base
         yield 'complete', base + [
+            mapping.Column(self.created_on),
+            mapping.Column(self.published_on),
             mapping.List(mapping.Definition('article', 'toc'), key='articles')
         ]

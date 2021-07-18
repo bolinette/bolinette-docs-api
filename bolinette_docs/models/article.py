@@ -21,19 +21,18 @@ class Article(core.Model):
     def _get_top_anchors(article):
         return [a for a in article.anchors if a.parent_id is None]
 
-    @classmethod
-    def responses(cls):
+    def responses(self):
         base: Any = [
-            mapping.Column(cls.name),
-            mapping.Column(cls.position),
-            mapping.Column(cls.lang)
+            mapping.Column(self.name),
+            mapping.Column(self.position),
+            mapping.Column(self.lang)
         ]
         yield base
         with_anchors = base + [
-            mapping.List(mapping.Definition('content'), function=cls._get_top_anchors, name='anchors')
+            mapping.List(mapping.Definition('content'), function=self._get_top_anchors, name='anchors')
         ]
         yield 'toc', with_anchors
         yield 'complete', with_anchors + [
-            mapping.Column(cls.markdown),
-            mapping.Column(cls.html)
+            mapping.Column(self.markdown),
+            mapping.Column(self.html)
         ]

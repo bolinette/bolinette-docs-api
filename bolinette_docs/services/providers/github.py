@@ -1,6 +1,7 @@
 import asyncio
 import os
 import tarfile
+from datetime import datetime
 
 import requests
 import yaml
@@ -35,7 +36,9 @@ class GitHubHooksService(core.Service):
                 version = await self.version_service.create({
                     'tag': release['tag_name'],
                     'released': not release.get('prerelease', False),
-                    'built': False
+                    'built': False,
+                    'created_on': datetime.utcnow(),
+                    'published_on': None
                 })
             asyncio.create_task(self.create_release(version, release['tarball_url']))
 
@@ -46,6 +49,7 @@ class GitHubHooksService(core.Service):
                 await self._download_and_extract(tmp_dir, archive_url)
                 await self._process_docs(version, tmp_dir)
                 version.built = True
+                version.published_on = datetime.utcnow()
         finally:
             paths.rm_r(tmp_dir)
 

@@ -11,4 +11,4 @@ class VersionService(core.Service):
         return await self.get_first_by('tag', tag)
 
     async def get_latest(self):
-        return await self.repo.query().order_by(lambda v: v.tag, desc=True).first()
+        return await self.repo.query().order_by(lambda v: v.published_on, desc=True).first()
