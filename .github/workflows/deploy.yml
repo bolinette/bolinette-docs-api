@@ -29,8 +29,7 @@ jobs:
             fi
             git fetch --prune
             git checkout master
-            git reset --hard master
-            git pull
+            git reset --hard origin/master
 
             echo "production" > env/.profile
             echo "secret_key: $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)" > env/env.local.production.yaml

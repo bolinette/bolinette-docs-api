@@ -12,4 +12,4 @@ COPY manifest.blnt.yaml manifest.blnt.yaml
 COPY env env
 COPY server.py server.py
 EXPOSE 5000
-CMD ["python", "server.py", "run_server"]
+CMD ["python", "server.py", "run", "server"]

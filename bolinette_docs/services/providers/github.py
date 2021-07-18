@@ -15,7 +15,7 @@ from bolinette_docs.services import VersionService, ArticleService
 
 
 @service('github')
-class GitHubHooksService(core.Service):
+class GitHubHooksService(core.SimpleService):
     def __init__(self, context: 'blnt.BolinetteContext'):
         super().__init__(context)
 

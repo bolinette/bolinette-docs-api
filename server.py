@@ -1,5 +1,4 @@
-import sys
+from bolinette_docs import bolinette
 
 if __name__ == '__main__':
-    from bolinette_docs import bolinette
-    bolinette.run_command(*sys.argv[1:])
+    bolinette.exec_cmd_args()
