@@ -1,7 +1,8 @@
-FROM python:3.8-slim-buster
+FROM python:3.9-slim-buster
 WORKDIR /bolinette-docs
-RUN apt-get update && apt-get install -y --no-install-recommends libc-dev libffi-dev libssl-dev libpq-dev gcc make
-RUN pip install -U pip
+RUN apt-get update && apt-get install -y --no-install-recommends gcc make build-essential libc-dev \
+    libffi-dev libssl-dev libpq-dev python3-dev cargo
+RUN pip install --upgrade pip
 RUN pip install wheel
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
