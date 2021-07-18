@@ -14,6 +14,10 @@ class DocsController(web.Controller):
     def article_service(self) -> ArticleService:
         return self.context.service('article')
 
+    @get('/versions', returns=web.Returns('version', as_list=True))
+    async def get_all_version(self):
+        return self.response.ok(data=await self.version_service.get_all())
+
     @get('', returns=web.Returns('version', 'complete'))
     @get('/v/{version}', returns=web.Returns('version', 'complete'))
     async def get_all_articles(self, match):
@@ -22,7 +26,7 @@ class DocsController(web.Controller):
             version = await self.version_service.get_first_by_tag(version_name)
         else:
             version = await self.version_service.get_latest()
-        return self.response.ok('OK', version)
+        return self.response.ok(data=version)
 
     @get('/a/{lang}/{version}/{name}', returns=web.Returns('article', 'complete'))
     async def get_article(self, match):
@@ -31,4 +35,4 @@ class DocsController(web.Controller):
         article_name = match['name']
         version = await self.version_service.get_first_by_tag(version_name)
         article = await self.article_service.get_one(version, lang, article_name)
-        return self.response.ok('OK', article)
+        return self.response.ok(data=article)

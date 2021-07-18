@@ -14,4 +14,4 @@ class GitHubHooksController(web.Controller):
     async def github_webhook(self, payload):
         if 'release' in payload and 'action' in payload:
             await self.github_service.process_release(payload['release'], payload['action'])
-        return self.response.ok('OK')
+        return self.response.ok()

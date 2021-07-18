@@ -15,11 +15,11 @@ class Version(core.Model):
 
     def responses(self):
         base: List[Any] = [
-            mapping.Column(self.tag)
+            mapping.Column(self.tag),
+            mapping.Column(self.created_on),
+            mapping.Column(self.published_on)
         ]
         yield base
         yield 'complete', base + [
-            mapping.Column(self.created_on),
-            mapping.Column(self.published_on),
             mapping.List(mapping.Definition('article', 'toc'), key='articles')
         ]
