@@ -34,7 +34,8 @@ jobs:
             echo "production" > env/.profile
             echo "secret_key: $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)" > env/env.local.production.yaml
             echo "github_secret: ${{ secrets.SIGNATURE_SECRET }}" >> env/env.local.production.yaml
-            echo "database: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}"  >> env/env.local.production.yaml
+            echo "database:" >> env/env.local.production.yaml
+            echo "  default: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}"  >> env/env.local.production.yaml
             echo "host: 0.0.0.0" >> env/env.local.production.yaml
             echo "debug: false" >> env/env.local.production.yaml
             echo "build_docs: true" >> env/env.local.production.yaml
